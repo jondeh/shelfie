@@ -1,26 +1,55 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {Component} from 'react';
+import './CSS/App.css';
+import './CSS/Header.css';
+import './CSS/Form.css';
+import './CSS/Dashboard.css';
+import './CSS/Product.css';
+import Form from './Components/Form'
+import FormEdit from './Components/FormEdit'
+import Header from './Components/Header'
+import Dashboard from './Components/Dashboard'
+import axios from 'axios';
+import {Switch, Route, HashRouter} from 'react-router-dom';
+import {withRouter} from 'react-router-dom'
+import Routes from '../src/routes'
 
-function App() {
+class App extends Component {
+  constructor(){
+    super()
+    this.state = {
+      inventory: []
+    }
+  }
+
+  componentDidMount = () => {
+    axios.get('/api/inventory').then(res => {
+      console.log("res", res.data)
+      this.setState({inventory: res.data})
+    })
+  }
+
+  render(){
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header />
+      <div className="body">
+      <Switch>
+        <Route exact path='/' render={() => <Dashboard 
+        inventory={this.state.inventory}
+        updateInventory={this.componentDidMount}
+        {...this.props}/>} />
+        <Route exact path='/form' render={() => <Form 
+        updateInventory={this.componentDidMount}
+        {...this.props}/>} />
+        <Route path='/form/edit/:id' render={() => <Form 
+        updateInventory={this.componentDidMount}
+        {...this.props}/>} />
+
+    </Switch>
+      </div>
     </div>
   );
+  }
 }
 
-export default App;
+export default withRouter(App);
